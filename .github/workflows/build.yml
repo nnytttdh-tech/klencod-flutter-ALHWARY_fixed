@@ -1,4 +1,4 @@
-name: Android Build
+name: ALHWARY Android Build
 
 on:
   push:
@@ -10,6 +10,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -19,18 +20,26 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-          cache: gradle
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
         with:
           gradle-version: '9.3.1'
 
-      - name: Build debug APK
-        run: gradle --no-daemon --stacktrace :app:assembleDebug
+      - name: Check project
+        run: |
+          echo "Checking ALHWARY Android project..."
+          test -f settings.gradle.kts
+          test -f build.gradle.kts
+          test -d app
+
+      - name: Build Debug APK
+        run: |
+          gradle --no-daemon --stacktrace :app:assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: ALHWARY-debug-apk
           path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
